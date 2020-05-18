@@ -20,6 +20,7 @@ class Message(JsonObject):
         attachments: Optional[List[Attachment]] = None,
         blocks: Optional[List[Block]] = None,
         markdown: bool = True,
+        **kwargs,
     ):
         """
         Create a message.
@@ -36,11 +37,15 @@ class Message(JsonObject):
                 as a fallback on clients that can't render blocks)
             markdown: Whether to parse markdown into formatting such as
                 bold/italics, or leave text completely unmodified.
+            kwargs: Any other property which should be included to the json structure.
         """
         self.text = text
         self.attachments = attachments or []
         self.blocks = blocks or []
         self.markdown = markdown
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+            self.attributes.add(key)
 
     @JsonValidator(
         f"attachments attribute cannot exceed {attachments_max_length} items"
